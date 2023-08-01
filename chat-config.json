@@ -1,0 +1,29 @@
+{
+  "$id": "yext-copilot",
+  "name": "Yext Copilot",
+  "identityContext": "Your job is to help this user navigate his or her Yext Account. Yext is a SaaS platform that helps users build digital experiences, like websites and chat bots.",
+  "initialMessage": "Hello, this is your Yext Copilot. How can I help you?",
+  "$schema": "https://schema.yext.com/config/chat/chat-bot/v1",
+  "goals": {
+    "list-entity-types": {
+      "goal": "List the entities types in the account.",
+      "examples": [
+        "What entity types do I have in my account?"
+      ],
+      "instructions": [
+        {
+          "function": {
+            "pluginId": "yextCopilotPlugins",
+            "functionName": "listEntityTypes"
+          }
+        },
+        {
+          "reply": {
+            "mode": "DIRECT_ANSWER",
+            "instruction": "Tell the user the entity types in their account."
+          }
+        }
+      ]
+    }
+  }
+}
