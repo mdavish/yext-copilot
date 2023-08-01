@@ -11,3 +11,26 @@ export const listEntityTypes: ChatFunction = async () => {
     queryResult: res,
   };
 };
+
+export const createEntityType: ChatFunction = async ({ notes }) => {
+  const yextClient = new YextClient(YEXT_API_KEY);
+  const neededSchema = z.object({
+    typeId: z.string(),
+    displayName: z.string(),
+    pluralDisplayName: z.string().optional(),
+  });
+  const { typeId, displayName } = neededSchema.parse(notes?.collectedData);
+
+  const res = await yextClient.createEntityType({
+    typeId: `ce_${typeId}`,
+    typeSchema: {
+      displayName,
+    },
+  });
+
+  return {
+    queryResult: {
+      ...res,
+    },
+  };
+};

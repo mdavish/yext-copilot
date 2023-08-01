@@ -24,6 +24,49 @@
           }
         }
       ]
+    },
+    "create-entity-type": {
+      "goal": "Create a new entity type.",
+      "examples": [
+        "Create a new entity type.",
+        "Create a new entity type called 'My New Entity Type'."
+      ],
+      "instructions": [
+        {
+          "collect": {
+            "instruction": "Ask the user for display name and ID of the entity type they want to create.",
+            "fields": [
+              {
+                "id": "typeId",
+                "optional": false,
+                "type": "STRING"
+              },
+              {
+                "id": "displayName",
+                "optional": false,
+                "type": "STRING"
+              },
+              {
+                "id": "pluralDisplayName",
+                "optional": true,
+                "type": "STRING"
+              }
+            ]
+          }
+        },
+        {
+          "function": {
+            "pluginId": "yextCopilotPlugins",
+            "functionName": "createEntityType"
+          }
+        },
+        {
+          "reply": {
+            "mode": "CONVERSATIONAL",
+            "instruction": "Tell the user that the entity type was created, and ask them if they want to start adding fields to it."
+          }
+        }
+      ]
     }
   }
 }

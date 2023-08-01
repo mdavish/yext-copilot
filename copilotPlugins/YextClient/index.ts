@@ -22,6 +22,11 @@ export default class YextClient {
     const res = await fetch(fullUrl, {
       method: "GET",
     });
+
+    if (!res.ok) {
+      throw new Error("Failed to list entity types");
+    }
+
     const json = await res.json();
     return ListEntitiesResponse.parse(json);
   }
@@ -47,22 +52,16 @@ export default class YextClient {
       $schema: "https://schema.yext.com/config/km/entity-type/v2",
       ...typeSchema,
     };
-
-    console.log(url.toString());
-
-    console.log({ fullBody });
-
     const res = await fetch(url.toString(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        $id: typeId,
-        $schema: "https://schema.yext.com/config/km/entity-type/v2",
-        ...typeSchema,
-      }),
+      body: JSON.stringify(fullBody),
     });
+    if (!res.ok) {
+      throw new Error("Failed to create entity type");
+    }
     return res.json();
   }
 }
