@@ -12,19 +12,31 @@ export const listEntityTypes: ChatFunction = async () => {
   };
 };
 
+export const listFields: ChatFunction = async () => {
+  const yextClient = new YextClient(YEXT_API_KEY);
+  const res = await yextClient.listFields();
+  return {
+    queryResult: res,
+  };
+};
+
 export const createEntityType: ChatFunction = async ({ notes }) => {
   const yextClient = new YextClient(YEXT_API_KEY);
   const neededSchema = z.object({
     typeId: z.string(),
     displayName: z.string(),
     pluralDisplayName: z.string().optional(),
+    description: z.string(),
   });
-  const { typeId, displayName } = neededSchema.parse(notes?.collectedData);
+  const { typeId, displayName, description } = neededSchema.parse(
+    notes?.collectedData
+  );
 
   const res = await yextClient.createEntityType({
-    typeId: `ce_${typeId}`,
-    typeSchema: {
+    resourceId: typeId,
+    resource: {
       displayName,
+      description,
     },
   });
 

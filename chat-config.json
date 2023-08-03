@@ -25,6 +25,26 @@
         }
       ]
     },
+    "list-fields": {
+      "goal": "List the fields in the account.",
+      "examples": [
+        "What fields do I have in my account?"
+      ],
+      "instructions": [
+        {
+          "function": {
+            "pluginId": "yextCopilotPlugins",
+            "functionName": "listFields"
+          }
+        },
+        {
+          "reply": {
+            "mode": "DIRECT_ANSWER",
+            "instruction": "Tell the user the fields in their account."
+          }
+        }
+      ]
+    },
     "create-entity-type": {
       "goal": "Create a new entity type.",
       "examples": [
@@ -43,6 +63,11 @@
               },
               {
                 "id": "displayName",
+                "optional": false,
+                "type": "STRING"
+              },
+              {
+                "id": "description",
                 "optional": false,
                 "type": "STRING"
               },
