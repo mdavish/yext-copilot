@@ -1,4 +1,4 @@
-import YextClient from "./YextClient/index.ts";
+import YextClient from "../YextClient/index.ts";
 import { type ChatFunction } from "./chatTypes.ts";
 import { z } from "https://deno.land/x/zod/mod.ts";
 

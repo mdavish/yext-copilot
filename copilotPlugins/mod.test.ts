@@ -1,4 +1,4 @@
-import YextClient from "./YextClient/index.ts";
+import YextClient from "./../YextClient/index.ts";
 
 const YEXT_API_KEY = "9a378056fe8dae3e34cb3002654f8a4d";
 

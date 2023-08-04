@@ -1,4 +1,4 @@
-import { z } from "https://deno.land/x/zod@v3.20.2/index.ts";
+import { z } from "https://deno.land/x/zod/mod.ts";
 import { EntityType } from "./inputTypes.ts";
 import type { CacResource } from "./inputTypes.ts";
 import { ListEntityTypesResponse, ListFieldsResponse } from "./outputTypes.ts";
