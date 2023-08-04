@@ -5,7 +5,8 @@ import type {
   RestApi,
   Reply,
   ChatBotJSON,
-} from "./baseTypes.ts";
+} from "./types.ts";
+import { PLUGIN_ID } from "./constants.ts";
 
 interface ChatFunctionPayload {
   messages: Array<{
@@ -76,7 +77,7 @@ export function createFunctionName(
 
 export const chatbotToJSON = (
   chatbot: ChatBotConfiguration,
-  pluginId = "generatedPlugins"
+  pluginId = PLUGIN_ID
 ): ChatBotJSON => {
   const json: ChatBotJSON = {
     $schema: "https://schema.yext.com/config/chat/chat-bot/v1",
@@ -99,9 +100,13 @@ export const chatbotToJSON = (
     for (const [index, instruction] of goal.instructions.entries()) {
       if (instruction.type !== "function") {
         json.goals[goalName].instructions.push({
-          [instruction.type]: instruction,
+          [instruction.type]: {
+            ...instruction,
+            // Get rid of the type property
+            // (since it's already the key of the object)
+            type: undefined,
+          },
         });
-        continue;
       } else {
         json.goals[goalName].instructions.push({
           function: {

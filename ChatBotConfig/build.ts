@@ -11,27 +11,31 @@
  * and the resources will be created in your account.
  */
 import { chatbotToJSON, createFunctionName } from "./index.ts";
+import { BUILD_DIR, PLUGINS_DIR, PLUGIN_ID } from "./constants.ts";
 import chatbotConfig from "../chatConfig.ts";
 
-const BUILD_DIR = "build";
+const relativeBuildDir = `./${BUILD_DIR}`;
 
 // If the build directory doesn't exist, create it
 try {
-  if (!(await Deno.stat(`./${BUILD_DIR}`)).isDirectory) {
-    await Deno.mkdir(`./${BUILD_DIR}`);
+  if (!(await Deno.stat(relativeBuildDir)).isDirectory) {
+    await Deno.mkdir(relativeBuildDir);
   }
 } catch (error) {
   if (error instanceof Deno.errors.NotFound) {
-    await Deno.mkdir(`./${BUILD_DIR}`);
+    await Deno.mkdir(relativeBuildDir);
   } else {
     throw error;
   }
 }
 
 // If the build directory isn't empty, delete everything in it
-for await (const entry of Deno.readDir(`./${BUILD_DIR}`)) {
-  await Deno.remove(`./${BUILD_DIR}/${entry.name}`, { recursive: true });
+for await (const entry of Deno.readDir(relativeBuildDir)) {
+  await Deno.remove(`${relativeBuildDir}/${entry.name}`, { recursive: true });
 }
+
+// Make the plugins directory
+await Deno.mkdir(`${relativeBuildDir}/${PLUGINS_DIR}`);
 
 // Now, we need ALL of the Typescript files that exist at the root
 // or any directory therein. EXCEPT for the build directory.
@@ -55,11 +59,10 @@ async function copyFileOrDirectory(
 
   if (name.endsWith(".ts") && !isDirectory) {
     const fromPath = [...currentPath, name].join("/");
-    const toPath = [BUILD_DIR, ...currentPath, name].join("/");
+    const toPath = [BUILD_DIR, PLUGINS_DIR, ...currentPath, name].join("/");
     await Deno.copyFile(fromPath, toPath);
   } else if (isDirectory && !directoriesToIgnore.includes(name)) {
-    const newDirPath = [BUILD_DIR, ...currentPath, name].join("/");
-
+    const newDirPath = [BUILD_DIR, PLUGINS_DIR, ...currentPath, name].join("/");
     try {
       if (!(await Deno.stat(newDirPath)).isDirectory) {
         await Deno.mkdir(newDirPath, { recursive: true });
@@ -81,7 +84,7 @@ async function copyFileOrDirectory(
 }
 
 for await (const entry of Deno.readDir("./")) {
-  await copyFileOrDirectory(entry);
+  await copyFileOrDirectory(entry, []);
 }
 
 // Save the JSON version as well
@@ -89,13 +92,13 @@ const json = chatbotToJSON(chatbotConfig);
 await Deno.writeTextFile(`./build/chat-config.json`, JSON.stringify(json));
 
 const resourceJson = {
-  $id: "yextCopilotPlugins",
+  $id: PLUGIN_ID,
   $schema: "https://schema.yext.com/config/platform/plugin/v1",
 };
 
 // Save this as the _resource.json file
 await Deno.writeTextFile(
-  "./build/_resource.json",
+  `${relativeBuildDir}/${PLUGINS_DIR}/_resource.json`,
   JSON.stringify(resourceJson)
 );
 
@@ -125,4 +128,4 @@ import chatConfig from "./chatConfig.ts";
 ${functionImportStrings.join("\n")}
 `;
 
-await Deno.writeTextFile(`./${BUILD_DIR}/mod.ts`, pluginFile);
+await Deno.writeTextFile(`./${BUILD_DIR}/${PLUGINS_DIR}/mod.ts`, pluginFile);
