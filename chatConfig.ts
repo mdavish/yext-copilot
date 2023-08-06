@@ -124,6 +124,26 @@ const config: ChatBotConfiguration = {
         },
       ],
     },
+    "create-crawler": {
+      examples: [
+        "Create a new crawler.",
+        "Create a new crawler called 'My New Crawler'.",
+      ],
+      goal: "Create a new crawler.",
+      instructions: [
+        {
+          type: "collect",
+          instruction: "Ask the user for the name of the crawler.",
+          fields: [
+            {
+              id: "crawlerName",
+              optional: false,
+              type: "STRING",
+            },
+          ],
+        },
+      ],
+    },
   },
 };
 
