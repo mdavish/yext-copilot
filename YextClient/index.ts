@@ -105,7 +105,9 @@ export default class YextClient {
 
     if (!res.ok) {
       console.error(res);
-      throw new Error(`Failed to create entity type: ${res.statusText}`);
+      throw new Error(
+        `Failed to create resource: ${resourceGroup}/${resourceType}. Error: ${res.status} - ${res.statusText}`
+      );
     }
     return res.json();
   }
