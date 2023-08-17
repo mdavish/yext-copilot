@@ -11,6 +11,17 @@ const config: ChatBotConfiguration = {
     "Your job is to help this user navigate his or her Yext Account. Yext is a SaaS platform that helps users build digital experiences, like websites and chat bots. Here is a change for testing.",
   initialMessage: "Hello, this is your Yext Copilot. How can I help you?",
   goals: {
+    "chit-chat": {
+      goal: "Chit chat with the user.",
+      examples: ["How are you?", "What's your name?", "Who are you?"],
+      instructions: [
+        {
+          type: "reply",
+          mode: "CONVERSATIONAL",
+          instruction: "Reply casually to the user.",
+        },
+      ],
+    },
     "list-entity-types": {
       goal: "List the entities types in the account.",
       examples: ["What entity types do I have in my account?"],
