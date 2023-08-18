@@ -1,6 +1,7 @@
 import { ChatBotConfiguration } from "./ChatBotConfig/index.ts";
 import YextClient from "./YextClient/index.ts";
 import { z } from "https://deno.land/x/zod/mod.ts";
+import { predictSearchQuery } from "./gptUtils.ts";
 
 const YEXT_API_KEY = "9a378056fe8dae3e34cb3002654f8a4d";
 
@@ -8,9 +9,33 @@ const config: ChatBotConfiguration = {
   $id: "yext-copilot",
   name: "Yext Copilot",
   identityContext:
-    "Your job is to help this user navigate his or her Yext Account. Yext is a SaaS platform that helps users build digital experiences, like websites and chat bots. Here is a change for testing.",
+    "You are the Yext Copilot. Your job is to help this user navigate his or her Yext Account. Yext is a SaaS platform that helps users build digital experiences, like websites and chat bots.",
   initialMessage: "Hello, this is your Yext Copilot. How can I help you?",
   goals: {
+    "yext-software-question": {
+      goal: "Answer a question about Yext's software by looking at our documentation.",
+      examples: [
+        "How does the search algorithm work?",
+        "How do I install the Yext CLI?",
+        "What is the character limit for single line text fields?",
+      ],
+      instructions: [
+        {
+          type: "function",
+          function: predictSearchQuery,
+        },
+        {
+          type: "restApi",
+          method: "GET",
+          url: "https://prod-cdn.us.yextapis.com/v2/accounts/me/search/query?input=[[collectedData.searchQuery]]&experienceKey=yext-help-hitchhikers&api_key=01db1d1e5ebbaa7ea2e6807ad2196ab3&v=20220511&version=PRODUCTION&locale=en",
+        },
+        {
+          type: "reply",
+          mode: "DIRECT_ANSWER",
+          instruction: "Reply with the answer to the user's question.",
+        },
+      ],
+    },
     "chit-chat": {
       goal: "Chit chat with the user.",
       examples: ["How are you?", "What's your name?", "Who are you?"],
@@ -204,6 +229,18 @@ const config: ChatBotConfiguration = {
                 .toLowerCase()
                 .replace(/[^a-z0-9]/g, "-");
             }
+
+            console.log(
+              "I'm about to create a crawler with the following things"
+            );
+            console.log({
+              resourceId: fixedCrawlerId,
+              resource: {
+                name: crawlerName,
+                domains: [domain],
+                crawlSchedule: crawlSchedule,
+              },
+            });
 
             const res = await yextClient.createCrawler({
               resourceId: fixedCrawlerId,

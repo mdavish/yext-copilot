@@ -94,6 +94,10 @@ await Deno.writeTextFile(`./build/chat-config.json`, JSON.stringify(json));
 const resourceJson = {
   $id: PLUGIN_ID,
   $schema: "https://schema.yext.com/config/platform/plugin/v1",
+  // TODO: Somehow make this dynamic
+  globals: {
+    OPENAI_API_KEY: "${{OPENAI_API_KEY}}",
+  },
 };
 
 // Save this as the _resource.json file

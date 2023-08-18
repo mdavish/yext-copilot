@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import CommandPalette from "./components/CommandPalette";
 import Textarea from "react-expanding-textarea";
 import { cn } from "./lib/utils";
@@ -37,8 +37,17 @@ function App() {
     };
   }, []);
 
+  const bottomDifRev = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom of chat on new message
+  useEffect(() => {
+    if (bottomDifRev.current) {
+      bottomDifRev.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   return (
-    <div className="h-screen bg-slate-50 w-full text-4xl flex flex-row">
+    <div className="h-screen bg-slate-50 w-full text-4xl flex flex-row overflow-x-hidden">
       <CommandPalette
         onCopilotQuery={(query) => {
           chat.getNextMessage(query);
@@ -65,7 +74,7 @@ function App() {
       </div>
       <div
         className={cn(
-          "h-full border-l rounded-l-xl border-slate-200 bg-white flex flex-col relative transition-all duration-200 ease-in-out ",
+          "h-full border-l rounded-l-xl border-slate-200 flex flex-col relative transition-all duration-200 ease-in-out justify-end",
           showCopilot ? "w-1/4 max-w-xl shrink-0" : "w-0"
         )}
       >
@@ -79,35 +88,63 @@ function App() {
         >
           <FaArrowLeft className="text-slate-400 my-auto mx-auto w-3 h-3" />
         </button>
-        <div className="h-full flex flex-col overflow-auto justify-end divide-y text-base">
-          {messages.map((message) => (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              className={cn(
-                "text-base py-3 px-4 flex flex-row gap-x-3",
-                message.source === "USER" ? "bg-white" : "bg-slate-100"
-              )}
-            >
-              {message.source === "USER" ? (
-                <img
-                  className="w-8 h-8 rounded-lg shrink-0"
-                  src={littleDavish}
-                  alt="Davish"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-lg bg-indigo-800 shrink-0 flex">
-                  <FaRobot className="text-white my-auto mx-auto w-4 h-4" />
-                </div>
-              )}
-              <ReactMarkdown className="text-sm text-slate-900 prose-sm">
-                {message.text}
-              </ReactMarkdown>
-            </motion.div>
-          ))}
+        <div className="h-full flex flex-col justify-end">
+          <div className="max-h-full flex flex-col divide-y border-t text-base overflow-y-auto">
+            {messages.map((message) => (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                className={cn(
+                  "text-base py-3 px-4 flex flex-row gap-x-3",
+                  message.source === "USER" ? "bg-white" : "bg-slate-100"
+                )}
+              >
+                {message.source === "USER" ? (
+                  <img
+                    className="w-8 h-8 rounded-lg shrink-0"
+                    src={littleDavish}
+                    alt="Davish"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-indigo-800 shrink-0 flex">
+                    <FaRobot className="text-white my-auto mx-auto w-4 h-4" />
+                  </div>
+                )}
+                <ReactMarkdown
+                  className="text-sm text-slate-900 prose-sm"
+                  // Not sure why this is necessary, but it is
+                  components={{
+                    ul: ({ ...props }) => (
+                      <ul
+                        style={{
+                          display: "block",
+                          listStyleType: "disc",
+                          paddingInlineStart: "40px",
+                        }}
+                        {...props}
+                      />
+                    ),
+                    ol: ({ ...props }) => (
+                      <ul
+                        style={{
+                          display: "block",
+                          listStyleType: "decimal",
+                          paddingInlineStart: "40px",
+                        }}
+                        {...props}
+                      />
+                    ),
+                  }}
+                >
+                  {message.text}
+                </ReactMarkdown>
+              </motion.div>
+            ))}
+            <div ref={bottomDifRev} />
+          </div>
         </div>
         <div className="mt-auto p-4">
           <div className="relative flex flex-col h-full w-full">
@@ -122,7 +159,7 @@ function App() {
                 }
               }}
               placeholder="Ask copilot anything..."
-              className="resize-none text-sm py-3 pl-3 pr-6  text-slate-800 placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-0 focus:shadow-lg focus:border-slate-300 w-full border border-slate-200 transition-colors transition-shadow duration-200 ease-in-out"
+              className="resize-none text-sm py-3 pl-3 pr-10  text-slate-800 placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-0 focus:shadow-lg focus:border-slate-300 w-full border border-slate-200 transition-colors transition-shadow duration-200 ease-in-out"
             />
             <button
               onClick={() => {
