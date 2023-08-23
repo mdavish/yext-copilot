@@ -54,20 +54,22 @@ export default class YextClient {
     }
     const json = await res.json();
     if (!parser) {
-      return json;
+      return json as any;
     } else {
-      return parser.parse(json);
+      return parser.parse(json) as TParser extends z.ZodType<any, any>
+        ? z.infer<TParser>
+        : any;
     }
   }
 
-  private listFunctionFactory({
+  private listFunctionFactory<TParser extends z.ZodType<any, any>>({
     resourceGroup,
     resourceType,
     parser,
   }: {
     resourceGroup: string;
     resourceType: string;
-    parser: z.ZodType<any, any>;
+    parser: TParser;
   }) {
     return async () => {
       const result = await this.listConfigResource({
@@ -75,7 +77,7 @@ export default class YextClient {
         resourceType,
         parser,
       });
-      return result;
+      return result as z.infer<TParser>;
     };
   }
 

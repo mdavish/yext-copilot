@@ -20,6 +20,7 @@ export type Instruction = {
   if?: If;
   restApi?: RestApi;
   function?: Function;
+  select?: Select;
 };
 
 export type Search = {
@@ -49,6 +50,7 @@ export type Field = {
   id: string;
   type: "NUMBER" | "STRING" | "ENUM" | "BOOLEAN";
   optional?: boolean;
+  description?: string;
   possibleValues?: {
     value: string;
     description: string;
@@ -73,4 +75,10 @@ export type Function = {
   pluginId: string;
   functionName: string;
   tags?: { [key: string]: string };
+};
+
+export type Select = {
+  instruction?: string;
+  fieldId: string;
+  listSelector: string;
 };

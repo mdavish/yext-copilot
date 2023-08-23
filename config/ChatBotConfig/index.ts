@@ -4,6 +4,7 @@ import type {
   If,
   RestApi,
   Reply,
+  Select,
   ChatBotJSON,
 } from "./types.ts";
 import { PLUGIN_ID } from "./constants.ts";
@@ -36,6 +37,7 @@ type Instruction =
   | ({ type: "collect" } & Collect)
   | ({ type: "if" } & If)
   | ({ type: "restApi" } & RestApi)
+  | ({ type: "select" } & Select)
   | { type: "function"; function: ChatFunction };
 
 export type ChatBotConfiguration = {
