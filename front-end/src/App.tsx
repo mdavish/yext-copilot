@@ -23,6 +23,16 @@ function App() {
 
   const chat = useChatActions();
 
+  // In reality, this would be set dynamically in the app
+  // This is strictly for demo purposes
+  useEffect(() => {
+    chat.setContext({
+      username: "Max Davish",
+      businessId: "3472542",
+      useremail: "davish9@gmail.com",
+    });
+  }, []);
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === "k" && e.metaKey) {
@@ -117,12 +127,15 @@ function App() {
                   className="text-sm text-slate-900 prose-sm"
                   // Not sure why this is necessary, but it is
                   components={{
+                    a: ({ ...props }) => (
+                      <a {...props} className="text-blue-600 hover:underline" />
+                    ),
                     ul: ({ ...props }) => (
                       <ul
                         style={{
                           display: "block",
                           listStyleType: "disc",
-                          paddingInlineStart: "40px",
+                          paddingInlineStart: "20px",
                         }}
                         {...props}
                       />
@@ -132,7 +145,7 @@ function App() {
                         style={{
                           display: "block",
                           listStyleType: "decimal",
-                          paddingInlineStart: "40px",
+                          paddingInlineStart: "20px",
                         }}
                         {...props}
                       />

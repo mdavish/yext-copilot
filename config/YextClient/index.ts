@@ -1,7 +1,7 @@
 import { z } from "https://deno.land/x/zod/mod.ts";
 import { EntityType, Crawler } from "./inputTypes.ts";
 import type { CacResource } from "./inputTypes.ts";
-import { ListEntityTypesResponse, ListFieldsResponse } from "./outputTypes.ts";
+import { ListResourceResponseSchema } from "./outputTypes.ts";
 
 export default class YextClient {
   public apiKey: string;
@@ -147,13 +147,19 @@ export default class YextClient {
   public listFields = this.listFunctionFactory({
     resourceGroup: "km",
     resourceType: "field",
-    parser: ListFieldsResponse,
+    parser: ListResourceResponseSchema,
   });
 
   public listEntityTypes = this.listFunctionFactory({
     resourceGroup: "km",
     resourceType: "entity-type",
-    parser: ListEntityTypesResponse,
+    parser: ListResourceResponseSchema,
+  });
+
+  public listSearchExperiences = this.listFunctionFactory({
+    resourceGroup: "answers",
+    resourceType: "answers-config",
+    parser: ListResourceResponseSchema,
   });
 
   public createEntityType = this.createFunctionFactory<EntityType>({

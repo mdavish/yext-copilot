@@ -93,6 +93,59 @@ const config: ChatBotConfiguration = {
         },
       ],
     },
+    "submit-support-ticket": {
+      goal: "Submit a ticket to Yext's support team.",
+      examples: [
+        "I need to speak to a person.",
+        "I want to submit a ticket.",
+        "I need help.",
+        "I need to talk to someone.",
+      ],
+      instructions: [
+        {
+          type: "collect",
+          instruction:
+            "Let the user know you're sorry they're having difficulty and that you'll help them get in touch with Yext's support team. Ask them to describe their issue so you can help them get in touch with the right person.",
+          fields: [
+            {
+              id: "description",
+              type: "STRING",
+              description:
+                "A description of the user's issue, including any error messages they're seeing.",
+              optional: false,
+            },
+          ],
+        },
+        // TODO: Actually send data to Zendesk
+        {
+          type: "reply",
+          mode: "CONVERSATIONAL",
+          instruction:
+            "Let the user know that you've submitted their ticket and that it's ID is 12345. Say someone from Yext will be in touch with them shortly.",
+        },
+      ],
+    },
+    "list-search-experiences": {
+      goal: "List the search experiences in the user's account.",
+      instructions: [
+        {
+          type: "function",
+          function: async () => {
+            const client = new YextClient(YEXT_API_KEY);
+            const res = await client.listSearchExperiences();
+            return {
+              queryResult: res,
+            };
+          },
+        },
+        {
+          type: "reply",
+          mode: "DIRECT_ANSWER",
+          instruction:
+            "Respond with a list of every single experience from the 'response' portion of the search results. For each search experience, create a deep link to its page using the following format: https://www.yext.com/s/[[context.businessId]]/search/experiences/configuration/<ID_OF_EXPERIENCE>/details",
+        },
+      ],
+    },
     "list-entity-types": {
       goal: "List the entities types in the account.",
       examples: ["What entity types do I have in my account?"],

@@ -3,6 +3,12 @@ import { getChatCompletion } from "./gptUtils.ts";
 
 const YEXT_API_KEY = "9a378056fe8dae3e34cb3002654f8a4d";
 
+Deno.test("Listing search experiences", async () => {
+  const yext = new YextClient(YEXT_API_KEY);
+  const res = await yext.listSearchExperiences();
+  console.log(res);
+});
+
 // This doesn't work, not totally sure why
 Deno.test("Creating a crawler", async () => {
   const yext = new YextClient(YEXT_API_KEY);
