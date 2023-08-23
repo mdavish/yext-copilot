@@ -47,6 +47,7 @@ function App() {
     };
   }, []);
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomDifRev = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom of chat on new message
@@ -63,6 +64,12 @@ function App() {
           chat.getNextMessage(query);
           setShowCopilot(true);
           setShowCommandPalette(false);
+          if (textareaRef.current) {
+            textareaRef.current.focus();
+            console.log("Focused");
+          } else {
+            throw new Error("Input ref is null");
+          }
         }}
         show={showCommandPalette}
         onSelect={(item) => console.log(item)}
@@ -74,34 +81,37 @@ function App() {
           },
         ]}
       />
-      <div className="w-full h-full flex">
+      <div className="w-full h-full flex relative">
         <button
           onClick={() => setShowCommandPalette(true)}
           className="text-5xl mx-auto mt-[35vh] p-5 rounded-xl text-slate-300 bg-white hover:bg-slate-50 border border-slate-300 shadow-lg hover:shadow-xl w-fit h-fit focus:outline-none"
         >
           ⌘ + K
         </button>
-      </div>
-      <div
-        className={cn(
-          "h-full border-l rounded-l-xl border-slate-200 flex flex-col relative transition-all duration-200 ease-in-out justify-end",
-          showCopilot ? "w-1/4 max-w-xl shrink-0" : "w-0"
-        )}
-      >
         <button
           onClick={() => setShowCopilot(!showCopilot)}
           className={cn(
-            "top-2 -left-3 bg-white hover:bg-slate-50 flex rounded-full border border-slate-400 absolute p-1.5",
+            "absolute z-30 h-fit w-fit top-10 -right-4  flex rounded-full border p-1.5 focus:outline-none transition-all duration-200 ease-in-out",
             // Rotate the arrow 180 degrees if the copilot is hidden
-            !showCopilot && "transform rotate-180 -left-6"
+            showCopilot
+              ? "rotate-180 text-slate-400 bg-white hover:bg-slate-50 border-slate-400"
+              : "transform right-4 bg-indigo-700 text-white hover:bg-indigo-800 border-white"
           )}
         >
-          <FaArrowLeft className="text-slate-400 my-auto mx-auto w-3 h-3" />
+          <FaArrowLeft className=" my-auto mx-auto w-3 h-3" />
         </button>
-        <div className="h-full flex flex-col justify-end">
+      </div>
+      <div
+        className={cn(
+          "h-full border-l rounded-l-3xl shadow-lg border-slate-200 flex flex-col relative transition-all duration-200 ease-in-out justify-end bg-white overflow-hidden",
+          showCopilot ? "w-1/3 max-w-md shrink-0" : "w-0 overflow-hidden"
+        )}
+      >
+        <div className="h-full flex flex-col justify-end overflow-y-auto">
           <div className="max-h-full flex flex-col divide-y border-t text-base overflow-y-auto">
-            {messages.map((message) => (
+            {messages.map((message, index) => (
               <motion.div
+                key={`message-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{
                   opacity: 1,
@@ -119,7 +129,7 @@ function App() {
                     alt="Davish"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-lg bg-indigo-800 shrink-0 flex">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-700 shrink-0 flex">
                     <FaRobot className="text-white my-auto mx-auto w-4 h-4" />
                   </div>
                 )}
@@ -162,12 +172,16 @@ function App() {
         <div className="mt-auto p-4">
           <div className="relative flex flex-col h-full w-full">
             <Textarea
+              autoFocus={true}
+              ref={textareaRef}
               onChange={(e) => setInput(e.target.value)}
               value={input}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  chat.getNextMessage(input);
+                  chat.getNextMessage(input).then(() => {
+                    textareaRef.current?.focus();
+                  });
                   setInput("");
                 }
               }}
@@ -176,7 +190,9 @@ function App() {
             />
             <button
               onClick={() => {
-                chat.getNextMessage(input);
+                chat.getNextMessage(input).then(() => {
+                  textareaRef.current?.focus();
+                });
                 setInput("");
               }}
               className={cn(
