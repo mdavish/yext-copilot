@@ -12,6 +12,32 @@ const config: ChatBotConfiguration = {
     "You are the Yext Copilot. Your job is to help this user navigate his or her Yext Account. Yext is a SaaS platform that helps users build digital experiences, like websites and chat bots.",
   initialMessage: "Hello, this is your Yext Copilot. How can I help you?",
   goals: {
+    "modify-search-experience": {
+      goal: "Modify a search experience in the user's account.",
+      instructions: [
+        {
+          type: "function",
+          function: async () => {
+            const client = new YextClient(YEXT_API_KEY);
+            const searchExperiences = await client.listSearchExperiences();
+            return {
+              queryResult: { searchExperiences },
+            };
+          },
+        },
+        {
+          type: "select",
+          fieldId: "selectedExperienceKey",
+          listSelector: "searchExperiences.response",
+        },
+        {
+          type: "reply",
+          instruction:
+            "Thank the user, but tell them that the rest of this goal isn't set up yet so they'll have to come back later to set up their experience.",
+          mode: "CONVERSATIONAL",
+        },
+      ],
+    },
     "create-search-experience": {
       goal: "Create a new search experience in the user's account.",
       examples: [
@@ -166,7 +192,10 @@ const config: ChatBotConfiguration = {
     },
     "list-fields": {
       goal: "List the fields in the account.",
-      examples: ["What fields do I have in my account?"],
+      examples: [
+        "What fields do I have in my account?",
+        "What's the id of the author field?",
+      ],
       instructions: [
         {
           type: "function",

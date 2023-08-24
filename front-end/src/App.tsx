@@ -91,7 +91,7 @@ function App() {
         <button
           onClick={() => setShowCopilot(!showCopilot)}
           className={cn(
-            "absolute z-30 h-fit w-fit top-10 -right-4  flex rounded-full border p-1.5 focus:outline-none transition-all duration-200 ease-in-out",
+            "absolute z-20 h-fit w-fit top-10 -right-4  flex rounded-full border p-1.5 focus:outline-none transition-all duration-200 ease-in-out",
             // Rotate the arrow 180 degrees if the copilot is hidden
             showCopilot
               ? "rotate-180 text-slate-400 bg-white hover:bg-slate-50 border-slate-400"
