@@ -195,6 +195,7 @@ function App() {
                 });
                 setInput("");
               }}
+              disabled={!canSend}
               className={cn(
                 "flex top-1/2 -translate-y-1/2 absolute z-10 p-2 rounded-md right-2 transition-all duration-200 ease-in-out my-auto",
                 canSend ? "bg-indigo-600 hover:bg-indigo-700" : "bg-none"

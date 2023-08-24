@@ -42,14 +42,11 @@ const config: ChatBotConfiguration = {
             };
           },
         },
-        // TODO: Add this once SELECT is supported in the JSON.
-        // {
-        //   instruction:
-        //     "Ask the user which entity types from their account they'd like to use.",
-        //   type: "select",
-        //   fieldId: "selectedEntityIds",
-        //   listSelector: "response",
-        // },
+        {
+          type: "select",
+          fieldId: "selectedEntityIds",
+          listSelector: "entityTypes.response",
+        },
         {
           type: "reply",
           mode: "CONVERSATIONAL",

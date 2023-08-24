@@ -78,7 +78,6 @@ export type Function = {
 };
 
 export type Select = {
-  instruction?: string;
   fieldId: string;
   listSelector: string;
 };
