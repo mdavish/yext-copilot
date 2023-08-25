@@ -80,12 +80,12 @@ const CommandPalette = ({
             placeholder="Search..."
           ></Combobox.Input>
         </div>
-        <Combobox.Options
-          static
-          className="py-2 max-h-96 flex flex-col overflow-y-auto"
-        >
-          {filteredResults.length > 0 &&
-            filteredResults.map((item) => (
+        {(filteredResults.length > 0 || query.length > 0) && (
+          <Combobox.Options
+            static
+            className="py-2 max-h-96 flex flex-col overflow-y-auto"
+          >
+            {filteredResults.map((item) => (
               <Combobox.Option key={item.id ?? item.href} value={item}>
                 {({ active }) => (
                   <div
@@ -102,26 +102,27 @@ const CommandPalette = ({
                 )}
               </Combobox.Option>
             ))}
-          {query && (
-            <Combobox.Option value="copilot">
-              {({ active }) => (
-                <div
-                  className={cx(
-                    active ? "bg-indigo-100" : "bg-slate-100",
-                    "px-4 py-2 text-slate-600 flex items-center"
-                  )}
-                >
-                  <FaRobot
-                    className="h-4 mr-4 text-indigo-700"
-                    aria-hidden="true"
-                  />
-                  <span className="font-medium">Ask Copilot</span> &nbsp;{" "}
-                  <span className="">{` ${query}`}</span>
-                </div>
-              )}
-            </Combobox.Option>
-          )}
-        </Combobox.Options>
+            {query && (
+              <Combobox.Option value="copilot">
+                {({ active }) => (
+                  <div
+                    className={cx(
+                      active ? "bg-indigo-100" : "bg-slate-100",
+                      "px-4 py-2 text-slate-600 flex items-center"
+                    )}
+                  >
+                    <FaRobot
+                      className="h-4 mr-4 text-indigo-700"
+                      aria-hidden="true"
+                    />
+                    <span className="font-medium">Ask Copilot</span> &nbsp;{" "}
+                    <span className="">{` ${query}`}</span>
+                  </div>
+                )}
+              </Combobox.Option>
+            )}
+          </Combobox.Options>
+        )}
         {query && filteredResults.length === 0 && (
           <p className="p-4 text-sm">No Results Found</p>
         )}

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import CommandPalette from "./components/CommandPalette";
+import CommandPalette, {
+  type CommandPaletteItem,
+} from "./components/CommandPalette";
 import Textarea from "react-expanding-textarea";
 import { cn } from "./lib/utils";
 import { FaArrowLeft } from "react-icons/fa";
@@ -57,6 +59,29 @@ function App() {
     }
   }, [messages]);
 
+  const navItems: CommandPaletteItem[] = [
+    {
+      name: "Account Settings",
+      href: "#",
+    },
+    {
+      name: "Entities",
+      href: "#",
+    },
+    {
+      name: "Analytics",
+      href: "#",
+    },
+    {
+      name: "Search",
+      href: "#",
+    },
+    {
+      name: "Reviews",
+      href: "#",
+    },
+  ];
+
   return (
     <div className="h-screen bg-slate-50 w-full text-4xl flex flex-row overflow-x-hidden">
       <CommandPalette
@@ -74,12 +99,8 @@ function App() {
         show={showCommandPalette}
         onSelect={(item) => console.log(item)}
         onClose={() => setShowCommandPalette(false)}
-        items={[
-          {
-            name: "Account Settings",
-            href: "#",
-          },
-        ]}
+        items={navItems}
+        defaultItems={navItems}
       />
       <div className="w-full h-full flex relative">
         <button
@@ -138,7 +159,11 @@ function App() {
                   // Not sure why this is necessary, but it is
                   components={{
                     a: ({ ...props }) => (
-                      <a {...props} className="text-blue-600 hover:underline" />
+                      <a
+                        {...props}
+                        target="_blank"
+                        className="text-blue-600 hover:underline"
+                      />
                     ),
                     ul: ({ ...props }) => (
                       <ul
@@ -177,7 +202,13 @@ function App() {
               onChange={(e) => setInput(e.target.value)}
               value={input}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
+                // If just the Enter key is pressed (without Cmd or Ctrl)
+                if (
+                  e.key === "Enter" &&
+                  !e.metaKey &&
+                  !e.ctrlKey &&
+                  !e.shiftKey
+                ) {
                   e.preventDefault();
                   chat.getNextMessage(input).then(() => {
                     textareaRef.current?.focus();
@@ -186,7 +217,7 @@ function App() {
                 }
               }}
               placeholder="Ask copilot anything..."
-              className="resize-none text-sm py-3 pl-3 pr-10  text-slate-800 placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-0 focus:shadow-lg focus:border-slate-300 w-full border border-slate-200 transition-colors transition-shadow duration-200 ease-in-out"
+              className="resize-none text-sm py-3 pl-3 pr-12  text-slate-800 placeholder:text-slate-400 rounded-xl focus:outline-none focus:ring-0 focus:shadow-lg focus:border-slate-300 w-full border border-slate-200 transition-colors transition-shadow duration-200 ease-in-out"
             />
             <button
               onClick={() => {

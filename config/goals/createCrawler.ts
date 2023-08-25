@@ -69,7 +69,9 @@ export const createCrawler: Goal = {
     },
     {
       type: "reply",
-      instruction: "Tell the user that the crawler was created.",
+      instruction: `Tell the user that the crawler was created. 
+      Tell them they can find the crawler at https://www.yext.com/s/[[context.businessId]]/account/crawlers
+       (but put the link in markdown, don't just paste it directly.`,
       mode: "CONVERSATIONAL",
     },
   ],

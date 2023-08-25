@@ -8,6 +8,7 @@ export const chitChat: Goal = {
     "Who are you?",
     "What can you do?",
     "What can you help me with?",
+    "What is Yext Copilot?",
   ],
   instructions: [
     {
