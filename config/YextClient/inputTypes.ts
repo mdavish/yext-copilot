@@ -29,9 +29,9 @@ type FileType = "HTML" | "PDF" | "allTypes";
 
 export interface Crawler {
   name: string;
-  enabled?: boolean;
-  crawlSchedule?: CrawlSchedule;
-  crawlStrategy?: CrawlStrategy;
+  enabled: boolean;
+  crawlSchedule: CrawlSchedule;
+  crawlStrategy: CrawlStrategy;
   domains: string[];
   ignoreQueryParameterOption?: IgnoreQueryParameterOption;
   ignoreQueryParametersList?: string[];
@@ -41,4 +41,13 @@ export interface Crawler {
   fileTypes?: FileType[] | "allTypes";
   rateLimit?: number;
   maxDepth?: number;
+}
+export interface FieldEligibilityGroup {
+  $id: string;
+  $schema: "https://schema.yext.com/config/km/field-eligibility-group/v1";
+  name: string;
+  description?: string;
+  entityType: string;
+  fields: string[];
+  required?: string[];
 }

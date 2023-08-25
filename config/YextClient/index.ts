@@ -1,7 +1,13 @@
-import { z } from "https://deno.land/x/zod/mod.ts";
-import { EntityType, Crawler } from "./inputTypes.ts";
+import z from "https://deno.land/x/zod@v3.21.4/index.ts";
+import { EntityType, Crawler, FieldEligibilityGroup } from "./inputTypes.ts";
 import type { CacResource } from "./inputTypes.ts";
 import { ListResourceResponseSchema } from "./outputTypes.ts";
+
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;
 
 export default class YextClient {
   public apiKey: string;
@@ -114,6 +120,37 @@ export default class YextClient {
     return res.json();
   }
 
+  public async patchConfigResource<TResource extends CacResource<TResource>>({
+    resourceGroup,
+    resourceType,
+    resourceId,
+    resource,
+  }: {
+    resourceGroup: string;
+    resourceType: string;
+    resourceId: string;
+    resource: DeepPartial<TResource>;
+  }) {
+    const fullUrl = this.getUrlWithParams(
+      `https://api.yextapis.com/v2/accounts/me/config/resources/${resourceGroup}/${resourceType}/${resourceId}`
+    );
+    const res = await fetch(fullUrl.toString(), {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(resource),
+    });
+
+    if (!res.ok) {
+      console.error(res);
+      throw new Error(
+        `Failed to patch resource: ${resourceGroup}/${resourceType}/${resourceId}. Error: ${res.status} - ${res.statusText}`
+      );
+    }
+    return res.json();
+  }
+
   private createFunctionFactory<TResource>({
     resourceGroup,
     resourceType,
@@ -139,6 +176,30 @@ export default class YextClient {
           $schema: schemaURL,
           ...resource,
         },
+      });
+      return result;
+    };
+  }
+
+  private patchFunctionFactory<TResource extends CacResource>({
+    resourceGroup,
+    resourceType,
+  }: {
+    resourceGroup: string;
+    resourceType: string;
+  }) {
+    return async ({
+      resourceId,
+      resource,
+    }: {
+      resourceId: string;
+      resource: DeepPartial<TResource>;
+    }) => {
+      const result = await this.patchConfigResource({
+        resourceGroup,
+        resourceType,
+        resourceId,
+        resource,
       });
       return result;
     };
@@ -173,4 +234,30 @@ export default class YextClient {
     resourceGroup: "crawler",
     resourceType: "site-crawler",
   });
+
+  public patchFieldEligibilityGroup =
+    this.patchFunctionFactory<FieldEligibilityGroup>({
+      resourceGroup: "km",
+      resourceType: "field-eligibility-group",
+    });
+
+  /**
+   * A more user friendly way to add a field to an entity type.
+   * (Because patching a field eligibility group is a bit weird)
+   */
+  public addFieldToEntityType = async ({
+    entityId,
+    fieldId,
+  }: {
+    entityId: string;
+    fieldId: string;
+  }) => {
+    const resourceId = `${entityId}.default`;
+    return await this.patchFieldEligibilityGroup({
+      resourceId,
+      resource: {
+        fields: [fieldId],
+      },
+    });
+  };
 }

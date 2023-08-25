@@ -2,6 +2,18 @@ import type { Goal } from "../ChatBotConfig/index.ts";
 import YextClient from "../YextClient/index.ts";
 import { YEXT_API_KEY } from "../ChatBotConfig/constants.ts";
 import z from "https://deno.land/x/zod@v3.21.4/index.ts";
+import { zodSchemaToCollectFields } from "../ChatBotConfig/zodUtils.ts";
+
+const CrawlerDataSchema = z.object({
+  crawlerId: z.string().optional().describe("The ID of the crawler."),
+  crawlerName: z.string().describe("The name of the crawler."),
+  domain: z.string().describe("The domain to crawl."),
+  crawlSchedule: z
+    .enum(["once", "daily", "weekly"])
+    .optional()
+    .default("daily")
+    .describe("The schedule to run the crawler on."),
+});
 
 export const createCrawler: Goal = {
   examples: [
@@ -13,58 +25,14 @@ export const createCrawler: Goal = {
     {
       type: "collect",
       instruction: "Ask the user for the name of the crawler.",
-      fields: [
-        {
-          id: "crawlerId",
-          optional: true,
-          type: "STRING",
-        },
-        {
-          id: "crawlerName",
-          optional: false,
-          type: "STRING",
-        },
-        {
-          id: "domain",
-          optional: false,
-          type: "STRING",
-        },
-        {
-          id: "crawlSchedule",
-          type: "ENUM",
-          optional: true,
-          possibleValues: [
-            {
-              value: "once",
-              description: "Run once",
-            },
-            {
-              value: "daily",
-              description: "Run daily",
-            },
-            {
-              value: "weekly",
-              description: "Run weekly",
-            },
-          ],
-        },
-      ],
+      fields: zodSchemaToCollectFields(CrawlerDataSchema),
     },
     {
       type: "function",
       function: async ({ notes }) => {
         const yextClient = new YextClient(YEXT_API_KEY);
-        const neededSchema = z.object({
-          crawlerId: z.string().optional(),
-          crawlerName: z.string(),
-          domain: z.string(),
-          crawlSchedule: z
-            .enum(["once", "daily", "weekly"])
-            .optional()
-            .default("daily"),
-        });
         const { crawlerId, crawlerName, domain, crawlSchedule } =
-          neededSchema.parse(notes?.collectedData);
+          CrawlerDataSchema.parse(notes?.collectedData);
 
         let fixedCrawlerId = crawlerId;
         if (!fixedCrawlerId) {
@@ -86,7 +54,9 @@ export const createCrawler: Goal = {
           resource: {
             name: crawlerName,
             domains: [domain],
-            crawlSchedule: crawlSchedule,
+            crawlSchedule: crawlSchedule ?? "daily",
+            crawlStrategy: "allPages", // TODO: Make this configurable
+            enabled: true,
           },
         });
 
