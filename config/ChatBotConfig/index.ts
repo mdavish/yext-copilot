@@ -45,13 +45,13 @@ export type ChatBotConfiguration = {
   name?: string;
   identityContext?: string;
   initialMessage?: string;
-  goals: {
-    [key: string]: {
-      goal: string;
-      examples?: string[];
-      instructions: Instruction[];
-    };
-  };
+  goals: { [key: string]: Goal };
+};
+
+export type Goal = {
+  goal: string;
+  examples?: string[];
+  instructions: Instruction[];
 };
 
 export function snakeToCamel(s: string): string {
